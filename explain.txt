@@ -1,0 +1,3 @@
+schema:- a structure of data
+model:- uses that structure(schema) to connect with database
+# To use our schema in application we need to convert it in model
