@@ -24,7 +24,7 @@ app.post("/signup", async(req, res)=>{
     // });
     try{
         await user.save();
-        
+
         res.send("user added successfully");
     }
     catch(err){
@@ -32,6 +32,23 @@ app.post("/signup", async(req, res)=>{
     }
 })
 
+app.patch("/signup", async(req, res)=>{
+    const {_id, ...data} = req.body;
+    try{
+        const user = await User.findByIdAndUpdate(_id, data, {
+            returnDocument: "after",
+            runValidators: true,
+        });
+        console.log(user);
+        res.send("User updated successfully");
+        if(!user){
+            return res.status(404).send("User not found");
+        }
+    }
+    catch(err){
+        res.status(400).send("Update Failed: "+ err.message);
+    }
+})
 
 connectDB()
     .then(()=>{
