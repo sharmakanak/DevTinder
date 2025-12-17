@@ -2,5 +2,24 @@ schema:- a structure of data
 model:- uses that structure(schema) to connect with database
 # To use our schema in application we need to convert it in model
 
+//for signup
 1. validate the data
 2. encrypt the password
+
+//for login
+compare the user data with the existing data in the database
+
+//when user login JWT is given by server to user for authentication
+JWT - json web token
+
+Cookie - holder(wrapper) for JWT
+=>To work with cookies install cookie parser
+//we can provide expiring time of any Cookie
+
+JWT working
+1.user login
+2.server validating user with email, password
+3.server provide unique JWT to user
+4.evrytime user send a request(reading, writing)
+5.Server validate the same JWT to verify that it is the same user or not 
+6. After validating provides the data user asking for..

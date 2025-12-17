@@ -11,4 +11,14 @@ const validateSignUpData = (req)=>{
         throw new Error("Create a strong password")
     }
 }
-module.exports ={validateSignUpData};
+
+const validateLoginData = (req)=>{
+    const{emailId, password} = req.body;
+    if(!emailId || !password){
+        throw new Error("Email and password is required");
+    }
+    if(!validator.isEmail(emailId)){
+        throw new Error("You are not registered");
+    }
+}
+module.exports ={validateSignUpData, validateLoginData};
