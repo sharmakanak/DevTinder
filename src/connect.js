@@ -5,7 +5,8 @@ const User = require("./models/user");
 const {validateSignUpData, validateLoginData} = require("./utils/validator")
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const {auth} = require("./middlewares/auth");
 //read the json data convert/parse in js format
 app.use(express.json());
 app.use(cookieParser());
@@ -88,7 +89,7 @@ app.post("/login", async(req, res)=>{
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if(isPasswordValid){
         //create JWT
-        const token = await jwt.sign({_id: user._id}, "arti@23490");
+        const token = await jwt.sign({_id: user._id}, "arti@23490", {expiresIn: "7d"});
         res.cookie("token", token);
         res.send("Login Successfully");
     }
@@ -101,19 +102,21 @@ app.post("/login", async(req, res)=>{
     }
 })
 
-app.get("/profile", async(req, res)=>{
+app.get("/profile", auth, async(req, res)=>{
     try{
-    const cookies = req.cookies;
-
-    const {token} = cookies;
-    //verify Token
-    const jwtVerify = await jwt.verify(token, "arti@23490");
-
-    const {_id} = jwtVerify;
-
-    //find the user
-    const user = await User.findById(_id);
+    const user = req.user;
     res.send(user);
+    }
+    catch(err){
+        res.status(404).send("Something is wrong");
+    }
+});
+
+app.post("/sendConnection",auth, async(req, res)=>{
+    try{
+        const user = req.user;
+        console.log("Sending Connection request");
+        res.send("Connection Sent by " + user.firstName);
     }
     catch(err){
         res.status(404).send("Something is wrong");
