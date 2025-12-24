@@ -51,7 +51,7 @@ authRouter.patch("/signup", async(req, res)=>{
     try{
         //condition to allow the user which feild they can update or not
         const AllowedUpdate = [
-            "about", "password", "age", "gender", "skills", "phoneNo"
+            "about", "password", "age", "skills", "phoneNo"
         ];
         const isUpdateAllowed = Object.keys(data).every((k)=>
             AllowedUpdate.includes(k));
@@ -96,6 +96,18 @@ authRouter.post("/login", async(req, res)=>{
     }
     catch(err){
         res.send("Error: " + err.message);
+    }
+})
+
+authRouter.post("/logout", async(req, res)=>{
+    try{
+        res.cookie("token", null, {
+            expires: new Date(Date.now()),
+        })
+        res.send("Logged Out Successfully");
+    }
+    catch{
+        res.status(400).send("Something went wrong");
     }
 })
 module.exports = authRouter;

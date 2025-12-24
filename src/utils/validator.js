@@ -21,4 +21,20 @@ const validateLoginData = (req)=>{
         throw new Error("You are not registered");
     }
 }
-module.exports ={validateSignUpData, validateLoginData};
+
+const validateProfileEdit = (req)=>{
+    const allowedEditFeild = [
+        "firstName",
+        "lastName",
+        "emailId",
+        "age",
+        "gender",
+        "about",
+        "skills"
+    ]
+
+    const isEditAllowed = Object.keys(req.body).every((field)=> allowedEditFeild.includes(field));
+
+    return isEditAllowed;
+}
+module.exports ={validateSignUpData, validateLoginData, validateProfileEdit};
