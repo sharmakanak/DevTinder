@@ -21,6 +21,8 @@ const connectionRequestSchema = mongoose.Schema({
     }
 
 );
+//compound indexing to fast the query of searching user in database
+connectionRequestSchema.index({fromUserId: 1, toUserId: 1});
 
 //Creating module of the schema
 const ConnectionRequestModel = new mongoose.model("ConnectionRequestModel", connectionRequestSchema);

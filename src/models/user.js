@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
+        //to fast the searching in DB we use indexing
+        //index: true,
         minlength: 3,
         maxlength: 20,
     },

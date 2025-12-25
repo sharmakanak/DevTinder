@@ -3,6 +3,7 @@ const requestRouter = express.Router();
 
 const {auth} = require("../middlewares/authUser");
 const ConnectionRequestModel = require("../models/connectionRequest");
+const User = require("../models/user");
 
 requestRouter.post("/request/send/:statusOf/:toUserId",auth, async(req, res)=>{
     try{
@@ -12,9 +13,16 @@ requestRouter.post("/request/send/:statusOf/:toUserId",auth, async(req, res)=>{
 
         const allowedStatus =["interested", "ignored"];
         if(!allowedStatus.includes(statusOf)){
-            return res.status(400).json({message: "invalide status type: "+ statusOf});
+            return res.status(400).json({message: "invalid status type: "+ statusOf});
         }
 
+        //checking if the userId is existing in database or not
+        const toUser = await User.findById(toUserId);
+        if(!toUser){
+            return res.status(400).send("User does not exist");
+        }
+
+        //checking if request is already had been made or not
         const existingConnectionRequest = await ConnectionRequestModel.findOne({
             $or:[
                 {fromUserId:fromUserId, toUserId:toUserId},
@@ -25,6 +33,10 @@ requestRouter.post("/request/send/:statusOf/:toUserId",auth, async(req, res)=>{
             return res.status(400).send("Request is already exist")
         }
 
+        //checking if user try to send any request to itself
+        if(fromUserId == fromUserId){
+            return res.status(400).send("You can not send request to yourself");
+        }
         const connectionRequest = new ConnectionRequestModel({
             fromUserId,
             toUserId,
