@@ -34,7 +34,7 @@ requestRouter.post("/request/send/:statusOf/:toUserId",auth, async(req, res)=>{
         }
 
         //checking if user try to send any request to itself
-        if(fromUserId == fromUserId){
+        if(fromUserId.toString() === toUserId.toString()){
             return res.status(400).send("You can not send request to yourself");
         }
         const connectionRequest = new ConnectionRequestModel({
@@ -50,8 +50,38 @@ requestRouter.post("/request/send/:statusOf/:toUserId",auth, async(req, res)=>{
         });
     }
     catch(err){
-        res.status(404).send("Something is wrong");
+        res.status(500).send("Something went wrong");
     }
 });
 
+requestRouter.post("/request/review/:statusOf/:requestId",auth, async(req, res)=>{
+    try{
+        const loggedInUser = req.user._id;
+        const {statusOf, requestId} = req.params;
+
+        const allowedStatus = ["accepted", "rejected"];
+        if(!allowedStatus.includes(statusOf)){
+            return res.status(400).send("Incorrect Status");
+        }
+
+        const connectionRequest = await ConnectionRequestModel.findOne({
+            _id: requestId,
+            statusOf: "interested",
+            toUserId: loggedInUser,
+        });
+        if(!connectionRequest){
+            return res.status(400).send("Incorrect Status");
+        }
+        connectionRequest.statusOf = statusOf;
+        const data = await connectionRequest.save();
+        res.json({
+            message: "Connection reviewed successfully",
+            data,
+        });
+
+    }
+    catch(err){
+        res.status(500).send("Something went wrong");
+    }
+})
 module.exports = requestRouter;
