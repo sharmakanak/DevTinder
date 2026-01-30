@@ -12,7 +12,7 @@ const app = express();
 app.get("/user/:id/:name", (req, res)=>{
     const param = {...req.params};
     console.log(param);
-    res.send({
+    res.status(200).json({
     name :  'kanak',
     age : '19',
     city : 'haridwar'})
@@ -34,10 +34,10 @@ app.listen(3000, ()=>{
 });
 
 app.get("/hello", (req, res)=>{
-    res.send("Just shut up I'm tired of you!!!!")
+    res.status(200).json("Just shut up I'm tired of you!!!!")
 })
 
 app.delete("/hello", (req, res)=>{
-    res.send("Deleted successfully");
+    res.status(200).json("Deleted successfully");
 })
 //s-2 e-4 t-29:06

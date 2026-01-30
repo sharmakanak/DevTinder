@@ -39,7 +39,7 @@ authRouter.post("/signup", async(req, res)=>{
     
         await user.save();
 
-        res.send("user added successfully");
+        res.status(200).json("user added successfully");
     }
     catch(err){
         res.status(500).send("Error : "+err.message);
@@ -64,7 +64,7 @@ authRouter.patch("/signup", async(req, res)=>{
             runValidators: true,
         });
         console.log(user);
-        res.send("User updated successfully");
+        res.status(200).json("User updated successfully");
         if(!user){
             return res.status(404).send("User not found");
         }
@@ -77,25 +77,29 @@ authRouter.patch("/signup", async(req, res)=>{
 authRouter.post("/login", async(req, res)=>{
     try{
         validateLoginData(req);
-    const {emailId, password} = req.body;
+    const {emailId, pass} = req.body;
     const user = await User.findOne({emailId});
     if(!user){
         throw new Error("Invalid Cresidentials")
     };
 
     
-    const isPasswordValid = await user.passwordValidationChecking(password);
+    const isPasswordValid = await user.passwordValidationChecking(pass);
     if(isPasswordValid){
         const token = await user.getJWT();
         res.cookie("token", token);
-        res.send("Login Successfully");
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+});
+
     }
     else{
         throw new Error("Invalid Cresidentials");
     }
     }
     catch(err){
-        res.send("Error: " + err.message);
+        res.status(400).json("Error: " + err.message);
     }
 })
 
@@ -104,7 +108,7 @@ authRouter.post("/logout", async(req, res)=>{
         res.cookie("token", null, {
             expires: new Date(Date.now()),
         })
-        res.send("Logged Out Successfully");
+        res.status(200).json("Logged Out Successfully");
     }
     catch{
         res.status(400).send("Something went wrong");

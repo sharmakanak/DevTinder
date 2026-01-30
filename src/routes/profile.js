@@ -6,7 +6,7 @@ const {validateProfileEdit} = require("../utils/validator")
 profileRouter.get("/profile/view", auth, async(req, res)=>{
     try{
     const user = req.user;
-    res.send(user);
+    res.status(200).json(user);
     }
     catch(err){
         res.status(404).send("Something is wrong");
@@ -22,7 +22,7 @@ profileRouter.patch("/profile/edit", auth, async(req, res)=>{
         const loggedInUser = req.user;
         Object.keys(req.body).forEach((key)=> (loggedInUser[key] = req.body[key]));
         await loggedInUser.save();
-        res.send(`${loggedInUser.firstName}, Profile updated successfully`);
+        res.status(200).json(`${loggedInUser.firstName}, Profile updated successfully`);
     }
     catch(err){
         res.status(400).send("Error: " + err.message);

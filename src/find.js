@@ -9,7 +9,7 @@ app.get("/user", async(req, res)=>{
     const lastUserName = req.body.lastName;
     try{
         const user = await User.find({lastName:lastUserName});
-        res.send(user);
+        res.status(200).json(user);
     }
     catch(err){
         res.status(400).send("Something went wrong");
@@ -19,7 +19,7 @@ app.get("/user", async(req, res)=>{
 app.get("/feed", async(req, res)=>{
     const user = await User.find({});
     try{
-        res.send(user);
+        res.status(200).json(user);
     }
     catch(err){
         res.status(400).send("Something went wrong");
@@ -31,7 +31,7 @@ app.get("/one", async(req, res)=>{
     //always return the first one object that matches with the condition
     const user = await User.findOne({lastName: lastUserName})
     try{
-        res.send(user);
+        res.status(200).json(user);
     }
     catch(err){
         res.status(400).send("Something went wrong");
@@ -42,7 +42,7 @@ app.delete("/user", async(req, res)=>{
     const userId = req.body.userId;
     const user = await User.findByIdAndDelete(userId);
     try{
-        res.send("User deleted successfully");
+        res.status(200).json("User deleted successfully");
     }
     catch(err){
         res.status(400).send("Something went wrong");
@@ -54,7 +54,7 @@ app.patch("/user", async(req, res)=>{
     
     try{
         await User.findByIdAndUpdate(_id, data)
-        res.send("User updated successfully");
+        res.status(200).json("User updated successfully");
     }
     catch(err){
         res.status(500).send("Something went wrong");
