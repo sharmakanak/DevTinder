@@ -20,6 +20,7 @@ const validateLoginData = (req)=>{
     if(!validator.isEmail(emailId)){
         throw new Error("You are not registered");
     }
+    return true;
 }
 
 const validateProfileEdit = (req)=>{
