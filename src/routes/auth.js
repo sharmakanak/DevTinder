@@ -92,7 +92,7 @@ authRouter.post("/login", async(req, res)=>{
         const token = await user.getJWT();
         res.cookie("token", token,{
             httpOnly: true,
-            sameSite: "none",
+            sameSite: "lax",
             secure: false,
         });
         res.status(200).json({
@@ -117,7 +117,11 @@ authRouter.post("/login", async(req, res)=>{
 authRouter.post("/logout", async(req, res)=>{
     try{
         res.cookie("token", null, {
-            expires: new Date(Date.now()),
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+            maxAge: 0,
+            path: "/"
         })
         res.status(200).json("Logged Out Successfully");
     }
