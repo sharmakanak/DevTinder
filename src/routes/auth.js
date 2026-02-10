@@ -94,6 +94,7 @@ authRouter.post("/login", async(req, res)=>{
             httpOnly: true,
             sameSite: "lax",
             secure: false,
+            path: "/",
         });
         res.status(200).json({
             success: true,
@@ -115,18 +116,25 @@ authRouter.post("/login", async(req, res)=>{
 })
 
 authRouter.post("/logout", async(req, res)=>{
+    console.log("Logout Hit");
     try{
-        res.cookie("token", null, {
+        res.clearCookie("token", {
             httpOnly: true,
             sameSite: "lax",
             secure: false,
             maxAge: 0,
             path: "/"
         })
-        res.status(200).json("Logged Out Successfully");
+        res.status(200).json({
+            success: true,
+            message: "Logged out successfully",
+        });
     }
     catch{
-        res.status(400).send("Something went wrong");
+        res.status(400).json({
+            success: false,
+            message: "Logout failed",
+        });
     }
 })
 module.exports = authRouter;
