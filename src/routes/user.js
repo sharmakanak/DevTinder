@@ -1,16 +1,15 @@
-const express = require ("express");
+const express = require("express");
 const userRouter = express.Router();
 
-const {auth} = require("../middlewares/authUser");
+const { auth } = require("../middlewares/authUser");
 const ConnectionRequest = require("../models/connectionRequest");
-const { populate } = require("../models/user");
 const User = require("../models/user")
-userRouter.get("/user/request/received", auth, async(req, res)=>{
-    try{
+userRouter.get("/request/received", auth, async (req, res) => {
+    try {
         const loggedInUser = req.user._id;
         const connectionRequest = await ConnectionRequest.find({
             toUserId: loggedInUser,
-            statusOf: "interested" 
+            statusOf: "interested"
         }).populate("fromUserId", ["firstName", "lastName"])
         //populate is used to filter the info of the user 
 
@@ -19,30 +18,43 @@ userRouter.get("/user/request/received", auth, async(req, res)=>{
             data: connectionRequest
         })
     }
-    catch(err){
-        res.status(500).send("Something went wrong");
+    catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Error fetching received requests: " + err.message
+        });
     }
 });
 
-userRouter.get("/user/connection", auth, async(req, res)=>{
-    try{
+userRouter.get("/connection", auth, async (req, res) => {
+    try {
         const loggedInUser = req.user._id;
         const connectionRequest = await ConnectionRequest.find({
             $or: [
-                {toUserId: loggedInUser._id, statusOf: "accepted"},
-                {fromUserId: loggedInUser._id, statusOf: "accepted"}
+                { toUserId: loggedInUser, statusOf: "accepted" },
+                { fromUserId: loggedInUser, statusOf: "accepted" }
             ]
-        }).populate("fromUserId", ["firstName", "lastName"]);
-        const data =connectionRequest.map((raw)=>raw.fromUserId);
-        res.json({data});
+        }).populate("fromUserId", ["firstName", "lastName"])
+            .populate("toUserId", ["firstName", "lastName"]);
+
+        const data = connectionRequest.map((raw) => {
+            if (raw.fromUserId._id.toString() === loggedInUser.toString()) {
+                return raw.toUserId;
+            }
+            return raw.fromUserId;
+        });
+        res.json({ data });
     }
-    catch(err){
-        res.status(500).send("Something went wrong");
+    catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Error fetching connections: " + err.message
+        });
     }
 });
 
-userRouter.get("/user/feed", auth, async(req, res)=>{
-    try{
+userRouter.get("/feed", auth, async (req, res) => {
+    try {
         const loggedInUser = req.user;
 
         const page = parseInt(req.query.page) || 1;
@@ -50,30 +62,30 @@ userRouter.get("/user/feed", auth, async(req, res)=>{
         limit = limit > 50 ? 50 : limit;
         const skip = (page - 1) * limit;
         const connectionRequests = await ConnectionRequest.find({
-            $or:[
-                {fromUserId: loggedInUser._id},
-                {toUserId: loggedInUser._id}
+            $or: [
+                { fromUserId: loggedInUser._id },
+                { toUserId: loggedInUser._id }
             ]
         }).select("fromUserId toUserId")
 
         const hideUsersFromFeed = new Set();
-        connectionRequests.forEach((req)=>{
-           hideUsersFromFeed.add(req.fromUserId.toString());
-        hideUsersFromFeed.add(req.toUserId.toString());
+        connectionRequests.forEach((req) => {
+            hideUsersFromFeed.add(req.fromUserId.toString());
+            hideUsersFromFeed.add(req.toUserId.toString());
         });
 
         const users = await User.find({
             $and: [
-                {_id: {$nin: Array.from(hideUsersFromFeed)}},
-                {_id: {$ne: loggedInUser._id}},
+                { _id: { $nin: Array.from(hideUsersFromFeed) } },
+                { _id: { $ne: loggedInUser._id } },
             ]
-        }).select("firstName LastName").skip(skip).limit(limit);;
+        }).select("firstName lastName").skip(skip).limit(limit);;
 
-        res.json({data: users});
+        res.json({ data: users });
     }
-    catch(err){
-        res.status(400).json({message: err.message});
+    catch (err) {
+        res.status(400).json({ message: err.message });
     }
-    
+
 });
 module.exports = userRouter;

@@ -1,30 +1,30 @@
 const validator = require("validator");
-const validateSignUpData = (req)=>{
-    const{firstName, lastName, emailId, password} = req.body;
-    if(!firstName || !lastName){
+const validateSignUpData = (req) => {
+    const { firstName, lastName, emailId, password } = req.body;
+    if (!firstName || !lastName) {
         throw new Error("Name is not valid")
     }
-    else if(!validator.isEmail(emailId)){
+    else if (!validator.isEmail(emailId)) {
         throw new Error("Email is not valid")
     }
-    else if(!validator.isStrongPassword(password)){
+    else if (!validator.isStrongPassword(password)) {
         throw new Error("Create a strong password")
     }
 }
 
-const validateLoginData = (req)=>{
-    const{emailId, pass} = req.body;
-    if(!emailId || !pass){
+const validateLoginData = (req) => {
+    const { emailId, password } = req.body;
+    if (!emailId || !password) {
         throw new Error("Email and password is required");
     }
-    if(!validator.isEmail(emailId)){
+    if (!validator.isEmail(emailId)) {
         throw new Error("You are not registered");
     }
     return true;
 }
 
-const validateProfileEdit = (req)=>{
-    const allowedEditFeild = [
+const validateProfileEdit = (req) => {
+    const allowedEditField = [
         "firstName",
         "lastName",
         "emailId",
@@ -34,8 +34,8 @@ const validateProfileEdit = (req)=>{
         "skills"
     ]
 
-    const isEditAllowed = Object.keys(req.body).every((field)=> allowedEditFeild.includes(field));
+    const isEditAllowed = Object.keys(req.body).every((field) => allowedEditField.includes(field));
 
     return isEditAllowed;
 }
-module.exports ={validateSignUpData, validateLoginData, validateProfileEdit};
+module.exports = { validateSignUpData, validateLoginData, validateProfileEdit };

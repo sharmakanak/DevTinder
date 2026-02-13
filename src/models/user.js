@@ -20,32 +20,27 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         trim: true,
-        // validate(value){
-        //     if(!validator.isEmail(value)){
-        //         throw new Error("Invalid Email ID: "+ value);
-        //     }
-        // }
+        validate(value) {
+            if (!validator.isEmail(value)) {
+                throw new Error("Invalid Email ID: " + value);
+            }
+        }
     },
     password: {
         type: String,
         required: true,
-        // validate(value){
-        //     if(value.length<8){
-        //         throw new Error("Password must be of 8 characters")
-        //     }
-        // }
-        // validate(value){
-        //     if(!validator.isStrongPassword(value)){
-        //         throw new Error("Create a strong password");
-        //     }
-        // }
+        validate(value) {
+            if (!validator.isStrongPassword(value)) {
+                throw new Error("Create a strong password");
+            }
+        }
     },
     phoneNo: {
         type: String,
         required: true,
-        validate(value){
-            if(value.length !== 10){
-                throw new Error("invalid phone number")
+        validate(value) {
+            if (value.length !== 10 || !/^\d{10}$/.test(value)) {
+                throw new Error("Invalid phone number. Must be 10 digits.")
             }
         }
     },
@@ -55,8 +50,8 @@ const userSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        validate(value){
-            if(!["male", "female"].includes(value)){
+        validate(value) {
+            if (!["male", "female"].includes(value)) {
                 throw new Error("Gender not specified");
             }
         }
@@ -69,22 +64,22 @@ const userSchema = new mongoose.Schema({
         type: [String],
     }
 },
-{
-    //created time and updated time added to database
-    timestamps:true,
-});
+    {
+        //created time and updated time added to database
+        timestamps: true,
+    });
 
 //compairing the bcrypted password with the user password
-userSchema.methods.passwordValidationChecking = async function(passwordByUser){
+userSchema.methods.passwordValidationChecking = async function (passwordByUser) {
     const user = this;
     const isPasswordValid = await bcrypt.compare(passwordByUser, user.password);
     return isPasswordValid;
 }
 
 //creating token
-userSchema.methods.getJWT = async function(){
+userSchema.methods.getJWT = async function () {
     const user = this;
-    const token = await jwt.sign({_id: user._id}, "arti@23490", {expiresIn: "7d"});
+    const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
     return token;
 }
 const UserModel = mongoose.model("User", userSchema);
