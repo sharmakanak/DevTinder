@@ -10,7 +10,7 @@ userRouter.get("/request/received", auth, async (req, res) => {
         const connectionRequest = await ConnectionRequest.find({
             toUserId: loggedInUser,
             statusOf: "interested"
-        }).populate("fromUserId", ["firstName", "lastName"])
+        }).populate("fromUserId", ["firstName", "lastName", "photoUrl", "about"])
         //populate is used to filter the info of the user 
 
         res.json({
