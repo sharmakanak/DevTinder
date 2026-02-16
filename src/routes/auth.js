@@ -13,12 +13,12 @@ authRouter.post("/signup", async (req, res) => {
         validateSignUpData(req);
 
         //encrypt password(change to hash)
-        const { firstName, lastName, emailId, password, phoneNo, age, gender, skills } = req.body;
+        const { firstName, lastName, emailId, password, phoneNo, age, gender, skills, photoUrl } = req.body;
         const passwordHash = await bcrypt.hash(password, 10);
         console.log(passwordHash);
         //console.log(req.body);
         const user = new User({
-            firstName, lastName, emailId, phoneNo, password: passwordHash, age, gender, skills
+            firstName, lastName, emailId, phoneNo, password: passwordHash, age, gender, skills, photoUrl
         });
 
         //instances of model
@@ -54,7 +54,7 @@ authRouter.patch("/signup", async (req, res) => {
     try {
         //condition to allow the user which feild they can update or not
         const AllowedUpdate = [
-            "about", "password", "age", "skills", "phoneNo"
+            "about", "password", "age", "skills", "phoneNo", "photoUrl"
         ];
         const isUpdateAllowed = Object.keys(data).every((k) =>
             AllowedUpdate.includes(k));
