@@ -12,34 +12,36 @@ authRouter.post("/signup", async (req, res) => {
     try {
         validateSignUpData(req);
 
-        //encrypt password(change to hash)
         const { firstName, lastName, emailId, password, phoneNo, age, gender, skills, photoUrl } = req.body;
-        const passwordHash = await bcrypt.hash(password, 10);
-        console.log(passwordHash);
-        //console.log(req.body);
-        const user = new User({
-            firstName, lastName, emailId, phoneNo, password: passwordHash, age, gender, skills, photoUrl
-        });
 
-        //instances of model
-        // const user = new User({
-        //     firstName: "Kanak",
-        //     lastName: "Sharma",
-        //     emailId: "sharma@2108",
-        //     phoneNo: 1234567890,
-        //     age: 19
-        // });
-        // const user = new User({
-        //     firstName: "Rudra Pratap",
-        //     lastName: "Singh Jat",
-        //     emailId: "jat@0111",
-        //     phoneNo: 9876543210,
-        //     age: 18
-        // });
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        const user = new User({
+            firstName,
+            lastName,
+            emailId,
+            phoneNo,
+            password: passwordHash,
+            age,
+            gender,
+            skills,
+            photoUrl
+        });
 
         await user.save();
 
-        res.status(200).json("user added successfully");
+        const token = await user.getJWT();  
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "lax",
+        });
+
+        res.json({
+            success: true,
+            message: "Signup successful",
+            data: user
+        });
+
     }
     catch (err) {
         res.status(500).json({
@@ -48,6 +50,7 @@ authRouter.post("/signup", async (req, res) => {
         });
     }
 });
+
 
 authRouter.patch("/signup", async (req, res) => {
     const { _id, ...data } = req.body;

@@ -61,6 +61,7 @@ userRouter.get("/feed", auth, async (req, res) => {
         let limit = parseInt(req.query.limit) || 10;
         limit = limit > 50 ? 50 : limit;
         const skip = (page - 1) * limit;
+        // Exclude ALL users with any existing connection request (any status, either direction)
         const connectionRequests = await ConnectionRequest.find({
             $or: [
                 { fromUserId: loggedInUser._id },
@@ -79,7 +80,7 @@ userRouter.get("/feed", auth, async (req, res) => {
                 { _id: { $nin: Array.from(hideUsersFromFeed) } },
                 { _id: { $ne: loggedInUser._id } },
             ]
-        }).select("firstName lastName").skip(skip).limit(limit);;
+        }).select("firstName lastName photoUrl about").skip(skip).limit(limit);;
 
         res.json({ data: users });
     }
