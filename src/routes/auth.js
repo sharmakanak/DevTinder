@@ -76,7 +76,6 @@ authRouter.patch("/signup", async (req, res) => {
                 message: "User not found"
             });
         }
-        console.log(user);
         res.status(200).json("User updated successfully");
     }
     catch (err) {

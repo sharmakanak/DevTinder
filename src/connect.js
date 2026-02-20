@@ -29,8 +29,6 @@ app.use("/user",userRouter);
 
 connectDB()
     .then(()=>{
-        console.log("hello");
-        //first database connection should be there then we should listen to the server
         app.listen(1500, ()=>{
         console.log("server is running..");
     })
