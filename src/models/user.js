@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema({
     skills: {
         type: [String],
     },
+    address: {
+        type: String,
+        default: "",
+    },
     photoUrl: {
         type: [String],
     }

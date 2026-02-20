@@ -4,7 +4,7 @@ const validateSignUpData = (req) => {
     if (!firstName || !lastName) {
         throw new Error("Name is not valid")
     }
-    if (!phoneNo){
+    if (!phoneNo) {
         throw new error("Phone Number required");
     }
     if (!validator.isEmail(emailId)) {
@@ -35,6 +35,7 @@ const validateProfileEdit = (req) => {
         "gender",
         "about",
         "skills",
+        "address",
         "photoUrl"
     ]
 
