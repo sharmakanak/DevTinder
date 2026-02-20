@@ -5,7 +5,7 @@ const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require('cors')
 
-//read the json data convert/parse in js format
+//read the json data convert into js format
 app.use(express.json());
 app.use(cookieParser());
 
