@@ -12,7 +12,6 @@ const Message = require('./models/message');
 const app = express();
 const server = http.createServer(app);
 
-// ─── Express Middleware ────────────────────────────────────────────────────────
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
@@ -22,7 +21,6 @@ app.use(cors({
     allowedHeaders: "Content-Type, Authorization",
 }));
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
 const authRouter = require('./routes/auth');
 const profileRouter = require('./routes/profile');
 const requestRouter = require('./routes/request');
@@ -37,7 +35,6 @@ app.use("/user", userRouter);
 app.use("/chat", chatRouter);
 app.use("/photo", photoUploadRouter);
 
-// ─── Socket.io Setup ──────────────────────────────────────────────────────────
 const io = new Server(server, {
     cors: {
         origin: ["http://localhost:5173", "http://localhost:5174"],
@@ -46,15 +43,12 @@ const io = new Server(server, {
     },
 });
 
-// Helper: deterministic private room name from two user IDs
 const getRoomId = (userId1, userId2) => {
     return [userId1.toString(), userId2.toString()].sort().join("_");
 };
 
-// Socket.io auth middleware — reads JWT from the httpOnly cookie sent during handshake
 io.use(async (socket, next) => {
     try {
-        // Parse cookies from the handshake headers (cookie-parser not available here, parse manually)
         const rawCookie = socket.handshake.headers.cookie || "";
         const tokenMatch = rawCookie.match(/(?:^|;\s*)token=([^;]*)/);
         const token = tokenMatch ? decodeURIComponent(tokenMatch[1]) : null;
@@ -76,20 +70,15 @@ io.use(async (socket, next) => {
 
 io.on("connection", (socket) => {
     const userId = socket.user._id.toString();
-    console.log(`User connected: ${socket.user.firstName} (${userId})`);
 
-    // Join personal room so messages can be targeted to this user
     socket.join(userId);
 
-    // Join a private room with a specific user
     socket.on("joinChat", ({ targetUserId }) => {
         if (!targetUserId) return;
         const room = getRoomId(userId, targetUserId);
         socket.join(room);
-        console.log(`${socket.user.firstName} joined room: ${room}`);
     });
 
-    // Send a text message
     socket.on("sendMessage", async ({ targetUserId, text }) => {
         try {
             if (!targetUserId || !text || !text.trim()) return;
@@ -107,7 +96,6 @@ io.on("connection", (socket) => {
             ]);
 
             const room = getRoomId(userId, targetUserId);
-            // Emit to everyone in the private room (both sender and receiver)
             io.to(room).emit("receiveMessage", populated);
         } catch (err) {
             socket.emit("error", { message: "Failed to send message: " + err.message });

@@ -56,7 +56,6 @@ authRouter.post("/signup", async (req, res) => {
 authRouter.patch("/signup", async (req, res) => {
     const { _id, ...data } = req.body;
     try {
-        //condition to allow the user which feild they can update or not
         const AllowedUpdate = [
             "about", "password", "age", "skills", "phoneNo", "photoUrl"
         ];
@@ -67,7 +66,6 @@ authRouter.patch("/signup", async (req, res) => {
         }
         const user = await User.findByIdAndUpdate(_id, data, {
             returnDocument: "after",
-            //to udate the existing data
             runValidators: true,
         });
         if (!user) {

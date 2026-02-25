@@ -22,7 +22,7 @@ const messageSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Index for efficient chat history lookups
+
 messageSchema.index({ senderId: 1, receiverId: 1 });
 messageSchema.index({ createdAt: 1 });
 
